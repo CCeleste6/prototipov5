@@ -1,3 +1,4 @@
+
 const STORAGE_KEY = 'quiz-pm-pc:v1';
 
 const QUESTIONS = {
@@ -30,7 +31,8 @@ const houseState = {
 let participant = null;
 let idx = 0;
 let pmTotal = 0;
-let answers = {}; 
+let answers = {};
+let lastSavedAt = null;
 
 
 const el = {
@@ -48,8 +50,21 @@ const el = {
   resultDetail: document.getElementById('result-detail'),
   restartBtn: document.getElementById('restart-btn'),
   houseScores: document.getElementById('house-scores'),
+  saveStatus: document.getElementById('save-status'),
   nameField: document.getElementById('participant-name')
 };
+
+function formatTimestamp(ts){
+  if (!ts) return 'Nenhum progresso salvo';
+  const d = new Date(ts);
+  return `Progresso salvo em ${d.toLocaleString('pt-BR')}`;
+}
+
+function updateSaveIndicator(saved){
+  lastSavedAt = saved || Date.now();
+  el.saveStatus.textContent = formatTimestamp(lastSavedAt);
+  el.saveStatus.className = saved ? 'saved' : '';
+}
 
 function saveState(){
   const payload = {
@@ -57,9 +72,17 @@ function saveState(){
     idx,
     pmTotal,
     answers,
-    houseState
+    houseState,
+    savedAt: Date.now()
   };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    updateSaveIndicator(payload.savedAt);
+  } catch(e){
+
+    el.saveStatus.textContent = 'Não foi possível salvar localmente';
+    el.saveStatus.className = 'unsaved';
+  }
 }
 
 function loadState(){
@@ -72,10 +95,10 @@ function loadState(){
       idx = data.idx || 0;
       pmTotal = data.pmTotal || 0;
       answers = data.answers || {};
- 
       Object.keys(houseState).forEach(h=>{
         houseState[h].pc = (data.houseState && data.houseState[h] && Number(data.houseState[h].pc)) || houseState[h].pc;
       });
+      lastSavedAt = data.savedAt || null;
       return true;
     }
   } catch(e){
@@ -86,6 +109,8 @@ function loadState(){
 
 function clearState(){
   localStorage.removeItem(STORAGE_KEY);
+  lastSavedAt = null;
+  updateSaveIndicator(null);
 }
 
 function renderHouseScores(){
@@ -113,7 +138,6 @@ function startQuiz(){
 function restoreToUI(){
   if (!participant) return;
   el.nameField.value = participant.name || '';
-  // selecionar casa no select
   for (let i=0;i<el.houseSelect.options.length;i++){
     if (el.houseSelect.options[i].value === participant.house){
       el.houseSelect.selectedIndex = i; break;
@@ -124,11 +148,177 @@ function restoreToUI(){
   renderQuestion();
   updateStatus();
   renderHouseScores();
-
-  if (Object.keys(answers).length === allQuestions.length && allQuestions.length>0){
-    showResults();
-  }
+  el.saveStatus.textContent = formatTimestamp(lastSavedAt);
 }
 
 function renderQuestion(){
-  const q = all
+  const q = allQuestions[idx];
+  el.questionContainer.innerHTML = '';
+  const card = document.createElement('div');
+  const title = document.createElement('h3');
+  title.textContent = `${q.tema} — ${q.tipo}`;
+  const p = document.createElement('p');
+  p.textContent = q.enunciado;
+  card.appendChild(title);
+  card.appendChild(p);
+
+  if (q.alternativas){
+    const list = document.createElement('div');
+    list.className = 'alternatives';
+    q.alternativas.forEach((alt) => {
+      const b = document.createElement('div');
+      b.className = 'alt';
+      b.textContent = alt;
+      b.dataset.value = alt;
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.alt').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+      });
+      const prev = answers[q.id] && answers[q.id].answer;
+      if (prev && String(prev).trim().toLowerCase() === String(alt).trim().toLowerCase()){
+        b.classList.add('selected');
+      }
+      list.appendChild(b);
+    });
+    card.appendChild(list);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.style.width = '100%';
+    ta.rows = 3;
+    ta.id = 'open-answer';
+    if (answers[q.id] && answers[q.id].answer) ta.value = answers[q.id].answer;
+    card.appendChild(ta);
+  }
+
+  el.questionContainer.appendChild(card);
+}
+
+function updateStatus(){
+  el.pmScore.textContent = `PM: ${pmTotal}`;
+  el.qIndex.textContent = `Questão ${idx+1} / ${allQuestions.length}`;
+  el.prevBtn.disabled = idx === 0;
+  el.nextBtn.disabled = idx === allQuestions.length - 1;
+}
+
+function getCurrentAnswer(){
+  const q = allQuestions[idx];
+  if (q.alternativas){
+    const sel = document.querySelector('.alt.selected');
+    return sel ? sel.dataset.value : '';
+  } else {
+    const ta = document.getElementById('open-answer');
+    return ta ? ta.value.trim() : '';
+  }
+}
+
+function calculatePM(question, answer){
+  const correct = (String(answer).trim().toLowerCase() === String(question.resposta).trim().toLowerCase());
+  const pm = correct ? (question.pontos_PM || 0) : 0;
+  return { pmEarned: pm, correct };
+}
+
+function applyGatilhos(question, answer){
+  const { correct } = calculatePM(question, answer);
+  const applied = [];
+  if (!correct) return applied;
+  if (Array.isArray(question.gatilhos_PC)){
+    question.gatilhos_PC.forEach(g=>{
+      const house = g.casa || participant.house;
+      const pc = g.pc || 0;
+      if (pc > 0) {
+        houseState[house].pc += pc;
+        applied.push({ house, pc, motivo: g.tipo });
+      }
+    });
+  }
+  return applied;
+}
+
+el.startBtn.addEventListener('click', () => {
+  startQuiz();
+});
+
+el.prevBtn.addEventListener('click', () => {
+  if (idx > 0) { idx--; renderQuestion(); updateStatus(); saveState(); }
+});
+el.nextBtn.addEventListener('click', () => {
+  if (idx < allQuestions.length - 1) { idx++; renderQuestion(); updateStatus(); saveState(); }
+});
+
+el.submitBtn.addEventListener('click', () => {
+  const q = allQuestions[idx];
+  const answer = getCurrentAnswer();
+  if (!answer) { alert('Responda a questão antes de enviar.'); return; }
+  const prev = answers[q.id];
+  const res = calculatePM(q, answer);
+  pmTotal += res.pmEarned - ((prev && prev.pmEarned) || 0);
+  const gatilhos = applyGatilhos(q, answer);
+  answers[q.id] = { answer, correct: res.correct, pmEarned: res.pmEarned, gatilhos };
+  saveState();
+  renderHouseScores();
+  updateStatus();
+  if (idx < allQuestions.length - 1){ idx++; renderQuestion(); updateStatus(); saveState(); }
+  else { showResults(); }
+});
+
+function showResults(){
+  el.quizArea.classList.add('hidden');
+  el.results.classList.remove('hidden');
+  el.resultDetail.innerHTML = '';
+  const summary = document.createElement('div');
+  summary.className = 'result-row';
+  summary.innerHTML = `<strong>${participant.name}</strong> — Casa: ${participant.house} — <span>PM total: ${pmTotal}</span>`;
+  el.resultDetail.appendChild(summary);
+
+  Object.keys(answers).forEach((qid, i) => {
+    const a = answers[qid];
+    const row = document.createElement('div');
+    row.className = 'result-row';
+    row.innerHTML = `<div><strong>Questão ${i+1}</strong> — correta: ${a.correct} — PM ganho: ${a.pmEarned}</div>`;
+    if (a.gatilhos && a.gatilhos.length){
+      a.gatilhos.forEach(g => {
+        const gdiv = document.createElement('div');
+        gdiv.textContent = `Gatilho aplicado: ${g.motivo} => +${g.pc} PC para ${g.house}`;
+        row.appendChild(gdiv);
+      });
+    }
+    el.resultDetail.appendChild(row);
+  });
+
+  const housesRow = document.createElement('div');
+  housesRow.className = 'result-row';
+  housesRow.innerHTML = `<h3>Placar de Casas</h3>`;
+  Object.keys(houseState).forEach(h=>{
+    const d = document.createElement('div');
+    d.textContent = `${h}: PC = ${houseState[h].pc}`;
+    housesRow.appendChild(d);
+  });
+  el.resultDetail.appendChild(housesRow);
+
+  saveState();
+}
+
+el.restartBtn.addEventListener('click', () => {
+  if (!confirm('Reiniciar quiz local? Isso apagará progresso salvo neste navegador.')) return;
+  participant = null;
+  idx = 0;
+  pmTotal = 0;
+  answers = {};
+  Object.keys(houseState).forEach(h => houseState[h].pc = 0);
+  clearState();
+  renderHouseScores();
+  el.results.classList.add('hidden');
+  el.quizArea.classList.add('hidden');
+  el.nameField.value = '';
+});
+
+
+window.addEventListener('load', () => {
+  const ok = loadState();
+  if (ok) {
+    restoreToUI();
+  } else {
+    updateSaveIndicator(null);
+  }
+  renderHouseScores();
+});
