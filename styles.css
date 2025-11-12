@@ -3,6 +3,8 @@
   --card:#ffffff;
   --accent:#2b6cb0;
   --muted:#6b7280;
+  --saved:#16a34a;
+  --unsaved:#d97706;
 }
 *{box-sizing:border-box}
 body{
@@ -11,10 +13,14 @@ body{
 }
 .container{max-width:900px;margin:24px auto;padding:16px;}
 header{display:grid;gap:12px}
+.meta-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .houses{display:flex;gap:8px;flex-wrap:wrap}
 .house{background:var(--card);padding:8px 12px;border-radius:8px;border:1px solid #e5e7eb;display:flex;flex-direction:column;min-width:170px}
 .house strong{font-size:14px}
 .house .pc{margin-top:6px;font-weight:600;color:var(--accent)}
+.progress-indicator{align-self:center;background:var(--card);padding:8px 12px;border-radius:8px;border:1px solid #e5e7eb}
+.progress-indicator .saved{color:var(--saved);font-weight:600}
+.progress-indicator .unsaved{color:var(--unsaved);font-weight:600}
 .participant-form{display:flex;gap:8px;align-items:center}
 .participant-form input, .participant-form select{padding:8px;border-radius:6px;border:1px solid #d1d5db}
 button{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer}
