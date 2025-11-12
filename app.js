@@ -79,7 +79,6 @@ function saveState(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     updateSaveIndicator(payload.savedAt);
   } catch(e){
-
     el.saveStatus.textContent = 'Não foi possível salvar localmente';
     el.saveStatus.className = 'unsaved';
   }
@@ -217,20 +216,38 @@ function calculatePM(question, answer){
   return { pmEarned: pm, correct };
 }
 
-function applyGatilhos(question, answer){
+
+function collectGatilhos(question, answer){
   const { correct } = calculatePM(question, answer);
-  const applied = [];
-  if (!correct) return applied;
+  const collected = [];
+  if (!correct) return collected;
   if (Array.isArray(question.gatilhos_PC)){
-    question.gatilhos_PC.forEach(g=>{
-      const house = g.casa || participant.house;
-      const pc = g.pc || 0;
-      if (pc > 0) {
-        houseState[house].pc += pc;
-        applied.push({ house, pc, motivo: g.tipo });
-      }
+    question.gatilhos_PC.forEach(g => {
+
+      collected.push({ tipo: g.tipo || '', casa: g.casa || null, pc: g.pc || 0 });
     });
   }
+  return collected;
+}
+
+
+function applyGatilhosFinal(){
+  if (!participant || !participant.house) return [];
+  const applied = [];
+  Object.keys(answers).forEach(qid => {
+    const a = answers[qid];
+    if (!a.gatilhos || !Array.isArray(a.gatilhos)) return;
+    a.gatilhos.forEach(g => {
+
+      const targetHouse = g.casa || participant.house;
+      if (String(targetHouse) === String(participant.house)) {
+        if (g.pc && g.pc > 0) {
+          houseState[targetHouse].pc += g.pc;
+          applied.push({ house: targetHouse, pc: g.pc, motivo: g.tipo || 'Gatilho final' });
+        }
+      }
+    });
+  });
   return applied;
 }
 
@@ -251,24 +268,68 @@ el.submitBtn.addEventListener('click', () => {
   if (!answer) { alert('Responda a questão antes de enviar.'); return; }
   const prev = answers[q.id];
   const res = calculatePM(q, answer);
+
+
   pmTotal += res.pmEarned - ((prev && prev.pmEarned) || 0);
-  const gatilhos = applyGatilhos(q, answer);
-  answers[q.id] = { answer, correct: res.correct, pmEarned: res.pmEarned, gatilhos };
+
+
+  const collected = collectGatilhos(q, answer);
+
+
+  answers[q.id] = { answer, correct: res.correct, pmEarned: res.pmEarned, gatilhos: collected };
+
   saveState();
   renderHouseScores();
   updateStatus();
+
+
   if (idx < allQuestions.length - 1){ idx++; renderQuestion(); updateStatus(); saveState(); }
   else { showResults(); }
 });
 
 function showResults(){
+
+  const appliedGatilhos = applyGatilhosFinal();
+
+
+  const bonusPC = Math.floor((pmTotal * 10) / 100);
+  if (participant && participant.house && bonusPC > 0) {
+    houseState[participant.house].pc += bonusPC;
+  }
+
   el.quizArea.classList.add('hidden');
   el.results.classList.remove('hidden');
   el.resultDetail.innerHTML = '';
+
   const summary = document.createElement('div');
   summary.className = 'result-row';
   summary.innerHTML = `<strong>${participant.name}</strong> — Casa: ${participant.house} — <span>PM total: ${pmTotal}</span>`;
   el.resultDetail.appendChild(summary);
+
+
+  if (appliedGatilhos.length > 0) {
+    const gRow = document.createElement('div');
+    gRow.className = 'result-row';
+    gRow.innerHTML = `<strong>Vantagens aplicadas da casa ${participant.house}:</strong>`;
+    appliedGatilhos.forEach(g => {
+      const d = document.createElement('div');
+      d.textContent = `+${g.pc} PC — ${g.motivo}`;
+      gRow.appendChild(d);
+    });
+    el.resultDetail.appendChild(gRow);
+  } else {
+    const gRow = document.createElement('div');
+    gRow.className = 'result-row';
+    gRow.textContent = `Nenhuma vantagem da casa ${participant.house} foi ativada.`;
+    el.resultDetail.appendChild(gRow);
+  }
+
+
+  const bonusRow = document.createElement('div');
+  bonusRow.className = 'result-row';
+  bonusRow.innerHTML = `Bônus: 10% do PM convertido em PC = <strong>+${bonusPC} PC</strong> para a casa <strong>${participant.house}</strong>`;
+  el.resultDetail.appendChild(bonusRow);
+
 
   Object.keys(answers).forEach((qid, i) => {
     const a = answers[qid];
@@ -278,12 +339,14 @@ function showResults(){
     if (a.gatilhos && a.gatilhos.length){
       a.gatilhos.forEach(g => {
         const gdiv = document.createElement('div');
-        gdiv.textContent = `Gatilho aplicado: ${g.motivo} => +${g.pc} PC para ${g.house}`;
+        const target = g.casa || participant.house;
+        gdiv.textContent = `Gatilho registrado: ${g.tipo} => +${g.pc} PC para ${target}`;
         row.appendChild(gdiv);
       });
     }
     el.resultDetail.appendChild(row);
   });
+
 
   const housesRow = document.createElement('div');
   housesRow.className = 'result-row';
@@ -294,6 +357,7 @@ function showResults(){
     housesRow.appendChild(d);
   });
   el.resultDetail.appendChild(housesRow);
+
 
   saveState();
 }
