@@ -10,12 +10,20 @@
   <main class="container">
     <header>
       <h1>Quiz de PM e PC — Demo</h1>
-      <div class="houses" id="house-scores">
-        <div class="house" data-house="Precursores"><strong>Precursores</strong><span class="pc">PC: 0</span></div>
-        <div class="house" data-house="Visionários"><strong>Visionários</strong><span class="pc">PC: 0</span></div>
-        <div class="house" data-house="Guardiões"><strong>Guardiões</strong><span class="pc">PC: 0</span></div>
-        <div class="house" data-house="Solidários"><strong>Solidários</strong><span class="pc">PC: 0</span></div>
+
+      <div class="meta-row">
+        <div class="houses" id="house-scores">
+          <div class="house" data-house="Precursores"><strong>Precursores</strong><span class="pc">PC: 0</span></div>
+          <div class="house" data-house="Visionários"><strong>Visionários</strong><span class="pc">PC: 0</span></div>
+          <div class="house" data-house="Guardiões"><strong>Guardiões</strong><span class="pc">PC: 0</span></div>
+          <div class="house" data-house="Solidários"><strong>Solidários</strong><span class="pc">PC: 0</span></div>
+        </div>
+
+        <div class="progress-indicator" id="save-indicator">
+          <span id="save-status">Nenhum progresso salvo</span>
+        </div>
       </div>
+
       <div class="participant-form">
         <input id="participant-name" placeholder="Seu nome" />
         <select id="participant-house">
