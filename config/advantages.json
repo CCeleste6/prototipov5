@@ -1,0 +1,30 @@
+{
+  "Precursores": {
+    "resumo": "Vantagens focadas em liderança, pioneirismo e marca individual.",
+    "exemplos": [
+      {"nome":"Chama da Liderança","efeito":"+3 PC quando aluno for representante"},
+      {"nome":"Marca Individual III","efeito":"+50 PC quando aluno alcança nota máxima semanal"}
+    ]
+  },
+  "Visionários": {
+    "resumo":"Vantagens de criatividade, invenção e impacto escolar.",
+    "exemplos":[
+      {"nome":"Faísca Criativa I","efeito":"+3 PC por solução original"},
+      {"nome":"Manifesto Criativo","efeito":"+500 PC quando proposta é incorporada pela escola"}
+    ]
+  },
+  "Guardiões": {
+    "resumo":"Vantagens de disciplina, pontualidade e defesa coletiva.",
+    "exemplos":[
+      {"nome":"Escudo da disciplina I","efeito":"+3 PC por entrega semanal no prazo"},
+      {"nome":"Guardião Supremo","efeito":"+150 PC por completar semana sem falhas"}
+    ]
+  },
+  "Solidários": {
+    "resumo":"Vantagens que estimulam participação em grupo e consistência.",
+    "exemplos":[
+      {"nome":"Apoio Moral I","efeito":"+2 PC quando aluno participa pela primeira vez"},
+      {"nome":"Coroa da União","efeito":"Triplica pontos da semana com 100% de participação"}
+    ]
+  }
+}
