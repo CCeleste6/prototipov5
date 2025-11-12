@@ -37,7 +37,7 @@
     "tema": "Matemática",
     "tipo": "Problema",
     "enunciado": "Uma classe tem 24 alunos. Se 3/8 deles faltarem, quantos alunos permanecem presentes?",
-    "resposta": "18",
+    "resposta": "15",
     "pontos_PM": 7,
     "gatilhos_PC": [
       {"tipo":"Escudo da disciplina I","casa":"Guardiões","pc":3}
