@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz PM / PC — Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Quiz de PM e PC — Demo</h1>
+      <div class="houses" id="house-scores">
+        <div class="house" data-house="Precursores"><strong>Precursores</strong><span class="pc">PC: 0</span></div>
+        <div class="house" data-house="Visionários"><strong>Visionários</strong><span class="pc">PC: 0</span></div>
+        <div class="house" data-house="Guardiões"><strong>Guardiões</strong><span class="pc">PC: 0</span></div>
+        <div class="house" data-house="Solidários"><strong>Solidários</strong><span class="pc">PC: 0</span></div>
+      </div>
+      <div class="participant-form">
+        <input id="participant-name" placeholder="Seu nome" />
+        <select id="participant-house">
+          <option>Precursores</option>
+          <option>Visionários</option>
+          <option>Guardiões</option>
+          <option>Solidários</option>
+        </select>
+        <button id="start-btn">Iniciar Quiz</button>
+      </div>
+    </header>
+
+    <section id="quiz-area" class="hidden">
+      <div id="question-container"></div>
+      <div class="controls">
+        <button id="prev-btn">Anterior</button>
+        <button id="next-btn">Próxima</button>
+        <button id="submit-btn">Enviar Resposta</button>
+      </div>
+      <div class="status">
+        <span id="pm-score">PM: 0</span>
+        <span id="question-index"></span>
+      </div>
+    </section>
+
+    <section id="results" class="hidden">
+      <h2>Resultados</h2>
+      <div id="result-detail"></div>
+      <button id="restart-btn">Reiniciar</button>
+    </section>
+  </main>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
