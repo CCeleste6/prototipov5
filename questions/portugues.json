@@ -1,0 +1,56 @@
+[
+  {
+    "id": "p1",
+    "tema": "Português",
+    "tipo": "Múltipla escolha",
+    "enunciado": "Qual alternativa contém um verbo no pretérito perfeito?",
+    "alternativas": ["eu comia", "tu comeste", "eles comerão", "nós comeríamos"],
+    "resposta": "tu comeste",
+    "pontos_PM": 5,
+    "gatilhos_PC": [
+      {"tipo":"Inspiração Compartilhada I","casa":"Visionários","pc":7}
+    ]
+  },
+  {
+    "id": "p2",
+    "tema": "Português",
+    "tipo": "Aberta",
+    "enunciado": "Reescreva a frase no plural: 'O aluno entregou a tarefa no prazo.'",
+    "resposta": "Os alunos entregaram as tarefas no prazo.",
+    "pontos_PM": 6,
+    "gatilhos_PC": []
+  },
+  {
+    "id": "p3",
+    "tema": "Português",
+    "tipo": "Múltipla escolha",
+    "enunciado": "Assinale a alternativa em que 'por que' está corretamente usado para introduzir pergunta direta.",
+    "alternativas": ["Por que você saiu cedo?", "Por que do fato", "porque sim", "porquê da resposta"],
+    "resposta": "Por que você saiu cedo?",
+    "pontos_PM": 5,
+    "gatilhos_PC": [
+      {"tipo":"Apoio Moral I","casa":"Solidários","pc":2}
+    ]
+  },
+  {
+    "id": "p4",
+    "tema": "Português",
+    "tipo": "Múltipla escolha",
+    "enunciado": "Marque a alternativa com vírgula correta: 'Se você estudar __ passarás no exame.'",
+    "alternativas": [";"," ,"," —"," ."],
+    "resposta": " ,",
+    "pontos_PM": 5,
+    "gatilhos_PC": []
+  },
+  {
+    "id": "p5",
+    "tema": "Português",
+    "tipo": "Problema",
+    "enunciado": "Identifique a oração subordinada na frase: 'Quando chove, eu prefiro ficar em casa.'",
+    "resposta": "Quando chove",
+    "pontos_PM": 7,
+    "gatilhos_PC": [
+      {"tipo":"Voz Unida I","casa":"Solidários","pc":6}
+    ]
+  }
+]
