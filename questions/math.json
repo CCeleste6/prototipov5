@@ -1,0 +1,56 @@
+[
+  {
+    "id": "m1",
+    "tema": "Matemática",
+    "tipo": "Múltipla escolha",
+    "enunciado": "Calcule o valor de 3/4 de 48.",
+    "alternativas": ["32", "36", "24", "16"],
+    "resposta": "36",
+    "pontos_PM": 5,
+    "gatilhos_PC": [
+      {"tipo":"Marca Individual I","casa":"Precursores","pc":20}
+    ]
+  },
+  {
+    "id": "m2",
+    "tema": "Matemática",
+    "tipo": "Aberta",
+    "enunciado": "Resolva a equação 2x + 5 = 17. Qual o valor de x?",
+    "resposta": "6",
+    "pontos_PM": 6,
+    "gatilhos_PC": []
+  },
+  {
+    "id": "m3",
+    "tema": "Matemática",
+    "tipo": "Múltipla escolha",
+    "enunciado": "Qual é o MMC entre 12 e 18?",
+    "alternativas": ["36", "72", "54", "6"],
+    "resposta": "36",
+    "pontos_PM": 5,
+    "gatilhos_PC": [
+      {"tipo":"Faísca Criativa I","casa":"Visionários","pc":3}
+    ]
+  },
+  {
+    "id": "m4",
+    "tema": "Matemática",
+    "tipo": "Problema",
+    "enunciado": "Uma classe tem 24 alunos. Se 3/8 deles faltarem, quantos alunos permanecem presentes?",
+    "resposta": "18",
+    "pontos_PM": 7,
+    "gatilhos_PC": [
+      {"tipo":"Escudo da disciplina I","casa":"Guardiões","pc":3}
+    ]
+  },
+  {
+    "id": "m5",
+    "tema": "Matemática",
+    "tipo": "Múltipla escolha",
+    "enunciado": "Se um item custa R$ 45 e está com desconto de 20%, qual o preço final?",
+    "alternativas": ["R$36", "R$35", "R$37", "R$30"],
+    "resposta": "R$36",
+    "pontos_PM": 6,
+    "gatilhos_PC": []
+  }
+]
